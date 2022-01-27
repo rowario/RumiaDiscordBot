@@ -4,8 +4,9 @@
     "description": "",
     "main": "/dist/rumia.js",
     "prettier": {
+        "useTabs": true,
         "tabWidth": 4,
-        "printWidth": 120
+        "printWidth": 110
     },
     "scripts": {
         "dev": "ts-node-dev --respawn src/rumia.ts",

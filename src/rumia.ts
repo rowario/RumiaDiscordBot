@@ -6,17 +6,17 @@ import path from "path";
 import { runBot } from "./libs/discord";
 
 config({
-    path: findConfig(".env") ?? "../.env"
+	path: findConfig(".env") ?? "../.env",
 });
 
 async function bootstrap() {
-    await createConnection({
-        type: "mongodb",
-        url: process.env["DATABASE_URL"],
-        entities: [path.join(__dirname, "./entities/*.{ts,js}")],
-        useUnifiedTopology: true
-    });
-    await runBot();
+	await createConnection({
+		type: "mongodb",
+		url: process.env["DATABASE_URL"],
+		entities: [path.join(__dirname, "./entities/*.{ts,js}")],
+		useUnifiedTopology: true,
+	});
+	await runBot();
 }
 
 bootstrap().then(() => console.log("App started!"));
