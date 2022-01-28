@@ -30,6 +30,7 @@
     "dependencies": {
         "@discordx/importer": "^1.1.2",
         "cron": "^1.8.2",
+        "dayjs": "^1.10.7",
         "discord.js": "^13.6.0",
         "discordx": "^9.1.12",
         "dotenv": "^14.3.2",

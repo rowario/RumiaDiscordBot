@@ -21,7 +21,7 @@ export const client = new Client({
 client.on("ready", async () => {
 	await client.guilds.fetch();
 
-	// await client.clearApplicationCommands(...client.guilds.cache.map((x) => x.id));
+	await client.clearApplicationCommands(...client.guilds.cache.map((x) => x.id));
 	await client.initApplicationCommands();
 	await client.initApplicationPermissions();
 
