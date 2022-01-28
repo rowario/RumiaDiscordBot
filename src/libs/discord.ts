@@ -20,11 +20,10 @@ export const client = new Client({
 client.on("ready", async () => {
 	await client.guilds.fetch();
 
-	await client.clearApplicationCommands(...client.guilds.cache.map((x) => x.id));
+	// await client.clearApplicationCommands(...client.guilds.cache.map((x) => x.id));
 	await client.initApplicationCommands({
 		guild: { log: true },
 	});
-
 	await client.initApplicationPermissions();
 });
 
@@ -34,9 +33,10 @@ client.on("interactionCreate", async (interaction: Interaction) => {
 	} = interaction;
 	await getCustomRepository(CustomUserRepository).findOneOrCreate({ id }, { id });
 
-	if (interaction.isCommand()) {
+	try {
 		client.executeInteraction(interaction);
-		return;
+	} catch (e) {
+		console.log(`Got error while command execution`);
 	}
 });
 
