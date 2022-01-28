@@ -4,6 +4,7 @@ import { importx } from "@discordx/importer";
 import path from "path";
 import { getCustomRepository } from "typeorm";
 import { CustomUserRepository } from "../entities/User";
+import { runCrons } from "../crons";
 
 export const client = new Client({
 	intents: [
@@ -21,10 +22,10 @@ client.on("ready", async () => {
 	await client.guilds.fetch();
 
 	// await client.clearApplicationCommands(...client.guilds.cache.map((x) => x.id));
-	await client.initApplicationCommands({
-		guild: { log: true },
-	});
+	await client.initApplicationCommands();
 	await client.initApplicationPermissions();
+
+	await runCrons();
 });
 
 client.on("interactionCreate", async (interaction: Interaction) => {
