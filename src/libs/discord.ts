@@ -5,6 +5,7 @@ import path from "path";
 import { getCustomRepository } from "typeorm";
 import { CustomUserRepository } from "../entities/User";
 import { runCrons } from "../crons";
+import dayjs from "dayjs";
 
 export const client = new Client({
 	intents: [
@@ -41,12 +42,27 @@ client.on("interactionCreate", async (interaction: Interaction) => {
 	}
 });
 
+const messagesHistory: Map<string, number> = new Map();
+
 client.on("messageCreate", async (message: Message) => {
 	if (message.author.bot) return;
 	if (message.webhookId) return;
 
 	const { id } = message.author;
-	await getCustomRepository(CustomUserRepository).findOneOrCreate({ id }, { id });
+	const userRepository = getCustomRepository(CustomUserRepository);
+	const user = await userRepository.findOneOrCreate({ id }, { id });
+
+	if (
+		(messagesHistory.has(id) && (messagesHistory.get(id) ?? 0) > dayjs().unix() - 20) ||
+		user.activity >= 144
+	)
+		return;
+
+	// update activity
+	messagesHistory.set(id, dayjs().unix());
+	user.activity++;
+	user.last_tick = dayjs().unix();
+	await userRepository.save(user);
 });
 
 export async function runBot() {
