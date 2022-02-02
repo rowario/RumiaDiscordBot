@@ -9,7 +9,6 @@ import getDefaultPermissions from "../helpers/getDefaultPermissions";
 @SlashGroup("activity")
 @Permission(false)
 @Permission(getDefaultPermissions)
-@Permission({ id: "936403946128412763", type: "ROLE", permission: true })
 class Activity {
 	@Slash("top")
 	async top(interaction: CommandInteraction<"cached">) {

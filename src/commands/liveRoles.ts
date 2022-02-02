@@ -8,7 +8,6 @@ import getDefaultPermissions from "../helpers/getDefaultPermissions";
 @SlashGroup("live", "Live roles management.")
 @Permission(false)
 @Permission(getDefaultPermissions)
-@Permission({ id: "936403946128412763", type: "ROLE", permission: true })
 class LiveRoles {
 	@Slash("list")
 	async list(interaction: CommandInteraction<"cached">) {
