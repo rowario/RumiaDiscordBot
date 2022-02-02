@@ -3,10 +3,12 @@ import { CommandInteraction } from "discord.js";
 import { getRepository } from "typeorm";
 import { UserEntity } from "../entities/User";
 import dayjs from "dayjs";
+import getDefaultPermissions from "../helpers/getDefaultPermissions";
 
 @Discord()
 @SlashGroup("activity")
 @Permission(false)
+@Permission(getDefaultPermissions)
 @Permission({ id: "936403946128412763", type: "ROLE", permission: true })
 class Activity {
 	@Slash("top")

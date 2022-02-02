@@ -2,10 +2,12 @@ import { Discord, Permission, Slash, SlashGroup, SlashOption } from "discordx";
 import { AutocompleteInteraction, CommandInteraction, Role } from "discord.js";
 import { getRepository } from "typeorm";
 import { LiveRoleEntity } from "../entities/LiveRole";
+import getDefaultPermissions from "../helpers/getDefaultPermissions";
 
 @Discord()
 @SlashGroup("live", "Live roles management.")
 @Permission(false)
+@Permission(getDefaultPermissions)
 @Permission({ id: "936403946128412763", type: "ROLE", permission: true })
 class LiveRoles {
 	@Slash("list")
@@ -20,9 +22,8 @@ class LiveRoles {
 					liveRoles
 						.map(
 							(x) =>
-								`${roles.cache.get(x.roleId)?.toString() ?? `<@&${x.roleId}>`} => ${
-									roles.cache.get(x.liveRoleId)?.toString() ?? `<@&${x.liveRoleId}>`
-								}`
+								`${roles.cache.get(x.roleId)?.name ?? `${x.roleId}`} => ` +
+								`${roles.cache.get(x.liveRoleId)?.name ?? `${x.liveRoleId}`}`
 						)
 						.join("\n")
 			);

@@ -3,11 +3,14 @@ import { CommandInteraction, Role } from "discord.js";
 import { getRepository } from "typeorm";
 import { chooseHistoryEntity } from "../entities/chooseHistory";
 import dayjs from "dayjs";
+import getDefaultPermissions from "../helpers/getDefaultPermissions";
+import getModeratorPermissions from "../helpers/getModeratorPermissions";
 
 @Discord()
 @SlashGroup("random")
 @Permission(false)
-@Permission({ id: "936403946128412763", type: "ROLE", permission: true })
+@Permission(getDefaultPermissions)
+@Permission(getModeratorPermissions)
 class RandomStreamer {
 	@Slash("get")
 	async get(@SlashOption("role") role: Role, interaction: CommandInteraction) {
@@ -56,14 +59,16 @@ class RandomStreamer {
 		});
 		if (history.length < 1) return void (await interaction.reply("0 items in history list!"));
 		const {
-			guild: { members },
+			guild: { members, roles },
 		} = interaction;
 		await interaction.reply(
 			"Random Streamers history: \n" +
 				history
 					.map(
 						(x, i) =>
-							`**#${i + 1}** - ${members.cache.get(x.id)?.user.toString() ?? `<@${x.id}>`}`
+							`**#${i + 1}** - ${members.cache.get(x.id)?.user.tag ?? `${x.id}`} ` +
+							`( ${roles.cache.get(x.roleId)?.name.replace("@", "") ?? `${x.roleId}`} ) ` +
+							`<t:${x.date}:R>`
 					)
 					.join("\n")
 		);
