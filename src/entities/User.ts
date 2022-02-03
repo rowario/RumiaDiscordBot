@@ -13,6 +13,9 @@ export class UserEntity {
 
 	@Column()
 	last_tick: number = 0;
+
+	@Column()
+	lastTick: number = 0;
 }
 
 @EntityRepository(UserEntity)

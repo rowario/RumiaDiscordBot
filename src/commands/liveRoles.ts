@@ -3,6 +3,8 @@ import { AutocompleteInteraction, CommandInteraction, Role } from "discord.js";
 import { getRepository } from "typeorm";
 import { LiveRoleEntity } from "../entities/LiveRole";
 import getDefaultPermissions from "../helpers/getDefaultPermissions";
+import dayjs from "dayjs";
+import embeds from "../data/embeds";
 
 @Discord()
 @SlashGroup("live", "Live roles management.")
@@ -14,18 +16,12 @@ class LiveRoles {
 		const liveRoles = await getRepository(LiveRoleEntity).find({});
 		if (liveRoles.length) {
 			const {
-				guild: { roles },
+				guild: {
+					roles: { cache: rolesCache },
+				},
 			} = interaction;
-			await interaction.reply(
-				"Live roles list: \n" +
-					liveRoles
-						.map(
-							(x) =>
-								`${roles.cache.get(x.roleId)?.name ?? `${x.roleId}`} => ` +
-								`${roles.cache.get(x.liveRoleId)?.name ?? `${x.liveRoleId}`}`
-						)
-						.join("\n")
-			);
+
+			await interaction.reply({ embeds: [embeds.liveRolesTop(liveRoles, rolesCache)] });
 		} else await interaction.reply("You have not created any Live roles!");
 	}
 
@@ -40,9 +36,13 @@ class LiveRoles {
 			liveRepository.create({
 				roleId: role.id,
 				liveRoleId: liveRole.id,
+				createdAt: dayjs().unix(),
 			})
 		);
-		await interaction.reply("New role has been created!");
+		await interaction.reply({
+			ephemeral: true,
+			content: "New live role has been added!",
+		});
 	}
 
 	@Slash("delete")
@@ -66,9 +66,16 @@ class LiveRoles {
 		const liveRepository = getRepository(LiveRoleEntity);
 		const role = await liveRepository.findOne({ liveRoleId });
 		if (!role) {
-			return void (await interaction.reply("Live role not found!"));
+			await interaction.reply({
+				ephemeral: true,
+				content: "Live role not found!",
+			});
+			return;
 		}
 		await liveRepository.delete(role);
-		await interaction.reply("Live role successfully deleted!");
+		await interaction.reply({
+			ephemeral: true,
+			content: "Live role successfully deleted!",
+		});
 	}
 }

@@ -10,7 +10,7 @@ export default () => {
 				activity: {
 					$gt: 0,
 				},
-				last_tick: {
+				lastTick: {
 					$lt: dayjs().unix() - 60,
 				},
 			},
@@ -18,7 +18,7 @@ export default () => {
 		.then(async (users) => {
 			for (const user of users) {
 				user.activity--;
-				user.last_tick += 600;
+				user.lastTick += 600;
 				await userRepository.save(user);
 			}
 		});

@@ -1,10 +1,11 @@
 import { Discord, Permission, Slash, SlashGroup, SlashOption } from "discordx";
-import { CommandInteraction, Role } from "discord.js";
+import { CommandInteraction, MessageActionRow, MessageButton, Role } from "discord.js";
 import { getRepository } from "typeorm";
 import { chooseHistoryEntity } from "../entities/chooseHistory";
 import dayjs from "dayjs";
 import getDefaultPermissions from "../helpers/getDefaultPermissions";
 import getModeratorPermissions from "../helpers/getModeratorPermissions";
+import embeds from "../data/embeds";
 
 @Discord()
 @SlashGroup("random")
@@ -34,9 +35,12 @@ class RandomStreamer {
 				return alreadyChosen.indexOf(x.id) === -1;
 			});
 
-		const chosen = members.random();
+		let chosen = members.random();
 		if (members.size > 0 && chosen && chosen.presence) {
-			const stream = chosen.presence.activities.filter((x) => x.type === "STREAMING")[0];
+			await chosen.fetch();
+			const stream = chosen.presence.activities.filter(
+				(x) => x.type === "STREAMING" && x.name === "Twitch"
+			)[0];
 
 			await chosenRepository.save(
 				chosenRepository.create({
@@ -46,8 +50,21 @@ class RandomStreamer {
 				})
 			);
 
-			await interaction.reply(`Random member: ${chosen.toString()}\nStream link: ${stream.url}`);
-		} else await interaction.reply(`Cannot found any Streamers with this role!`);
+			const button = new MessageButton()
+				.setURL(stream.url ?? "")
+				.setStyle("LINK")
+				.setLabel("Twitch channel");
+
+			await interaction.reply({
+				embeds: [embeds.randomSteamer(stream, chosen)],
+				components: [new MessageActionRow({ components: [button] })],
+			});
+		} else {
+			await interaction.reply({
+				ephemeral: true,
+				content: "Cannot found any Streamers with this role!",
+			});
+		}
 	}
 
 	@Slash("history")
@@ -57,26 +74,31 @@ class RandomStreamer {
 				date: 1,
 			},
 		});
-		if (history.length < 1) return void (await interaction.reply("0 items in history list!"));
+		if (history.length < 1) {
+			await interaction.reply({
+				ephemeral: true,
+				content: "There is no history of previous random streamers!",
+			});
+			return;
+		}
 		const {
-			guild: { members, roles },
+			guild: {
+				members: { cache: membersCache },
+				roles: { cache: rolesCache },
+			},
 		} = interaction;
-		await interaction.reply(
-			"Random Streamers history: \n" +
-				history
-					.map(
-						(x, i) =>
-							`**#${i + 1}** - ${members.cache.get(x.id)?.user.tag ?? `${x.id}`} ` +
-							`( ${roles.cache.get(x.roleId)?.name.replace("@", "") ?? `${x.roleId}`} ) ` +
-							`<t:${x.date}:R>`
-					)
-					.join("\n")
-		);
+
+		await interaction.reply({
+			embeds: [embeds.randomStreamersHistory(history, membersCache, rolesCache)],
+		});
 	}
 
 	@Slash("clear")
 	async clear(interaction: CommandInteraction) {
 		await getRepository(chooseHistoryEntity).delete({});
-		await interaction.reply("History successfully cleared!");
+		await interaction.reply({
+			ephemeral: true,
+			content: "History successfully cleared!",
+		});
 	}
 }

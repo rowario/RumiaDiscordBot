@@ -1,9 +1,10 @@
 import { Discord, Permission, Slash, SlashGroup, SlashOption } from "discordx";
-import { CommandInteraction, MessageEmbed, Role } from "discord.js";
+import { CommandInteraction, Role } from "discord.js";
 import getDefaultPermissions from "../helpers/getDefaultPermissions";
 import { getCustomRepository } from "typeorm";
 import { CustomSettingsRepository } from "../entities/Settings";
 import { client } from "../libs/discord";
+import embeds from "../data/embeds";
 
 @Discord()
 @SlashGroup("settings", "RumiaBot settings.", {
@@ -17,19 +18,11 @@ class Settings {
 		await interaction.deferReply();
 
 		const settings = await getCustomRepository(CustomSettingsRepository).findOneOrCreate();
-		const { roles } = interaction.guild;
-		const embed = new MessageEmbed().setTitle("RumiaBot settings.").addFields([
-			{
-				name: "Moderator role: ",
-				value: `> ${roles.cache.get(settings.moderatorRoleId)?.toString() ?? "Not set yet."}`,
-			},
-			{
-				name: "Most active member role: ",
-				value: `> ${roles.cache.get(settings.mostActiveMemberRoleId)?.toString() ?? "Not set yet."}`,
-			},
-		]);
+		const {
+			roles: { cache: rolesCache },
+		} = interaction.guild;
 
-		await interaction.editReply({ embeds: [embed] });
+		await interaction.editReply({ embeds: [embeds.settings(settings, rolesCache)] });
 	}
 
 	@Slash("moderator")

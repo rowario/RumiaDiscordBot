@@ -10,4 +10,7 @@ export class LiveRoleEntity {
 
 	@Column()
 	liveRoleId!: string;
+
+	@Column()
+	createdAt!: number;
 }

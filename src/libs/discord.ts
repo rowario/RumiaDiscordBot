@@ -61,7 +61,7 @@ client.on("messageCreate", async (message: Message) => {
 	// update activity
 	messagesHistory.set(id, dayjs().unix());
 	user.activity++;
-	user.last_tick = dayjs().unix();
+	user.lastTick = dayjs().unix();
 	await userRepository.save(user);
 });
 
