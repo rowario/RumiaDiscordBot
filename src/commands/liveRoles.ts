@@ -21,7 +21,7 @@ class LiveRoles {
 				},
 			} = interaction;
 
-			await interaction.reply({ embeds: [embeds.liveRolesTop(liveRoles, rolesCache)] });
+			await interaction.reply({ embeds: [embeds.liveRolesList(liveRoles, rolesCache)] });
 		} else await interaction.reply("You have not created any Live roles!");
 	}
 

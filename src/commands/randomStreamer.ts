@@ -1,7 +1,7 @@
 import { Discord, Permission, Slash, SlashGroup, SlashOption } from "discordx";
 import { CommandInteraction, MessageActionRow, MessageButton, Role } from "discord.js";
 import { getRepository } from "typeorm";
-import { chooseHistoryEntity } from "../entities/chooseHistory";
+import { ChooseHistoryEntity } from "../entities/ChooseHistory";
 import dayjs from "dayjs";
 import getDefaultPermissions from "../helpers/getDefaultPermissions";
 import getModeratorPermissions from "../helpers/getModeratorPermissions";
@@ -15,7 +15,7 @@ import embeds from "../data/embeds";
 class RandomStreamer {
 	@Slash("get")
 	async get(@SlashOption("role") role: Role, interaction: CommandInteraction) {
-		const chosenRepository = getRepository(chooseHistoryEntity);
+		const chosenRepository = getRepository(ChooseHistoryEntity);
 		const alreadyChosen = (
 			await chosenRepository.find({
 				where: {
@@ -37,7 +37,6 @@ class RandomStreamer {
 
 		let chosen = members.random();
 		if (members.size > 0 && chosen && chosen.presence) {
-			await chosen.fetch();
 			const stream = chosen.presence.activities.filter(
 				(x) => x.type === "STREAMING" && x.name === "Twitch"
 			)[0];
@@ -69,7 +68,7 @@ class RandomStreamer {
 
 	@Slash("history")
 	async history(interaction: CommandInteraction<"cached">) {
-		const history = await getRepository(chooseHistoryEntity).find({
+		const history = await getRepository(ChooseHistoryEntity).find({
 			order: {
 				date: 1,
 			},
@@ -95,7 +94,7 @@ class RandomStreamer {
 
 	@Slash("clear")
 	async clear(interaction: CommandInteraction) {
-		await getRepository(chooseHistoryEntity).delete({});
+		await getRepository(ChooseHistoryEntity).delete({});
 		await interaction.reply({
 			ephemeral: true,
 			content: "History successfully cleared!",

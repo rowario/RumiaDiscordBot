@@ -1,11 +1,42 @@
-import { Activity, Collection, GuildMember, MessageEmbed, Role } from "discord.js";
+import { Activity, Channel, Collection, GuildMember, MessageEmbed, Role } from "discord.js";
 import { LiveRoleEntity } from "../entities/LiveRole";
 import { UserEntity } from "../entities/User";
-import { chooseHistoryEntity } from "../entities/chooseHistory";
+import { ChooseHistoryEntity } from "../entities/ChooseHistory";
 import { SettingsEntity } from "../entities/Settings";
+import { NotificationRoleEntity } from "../entities/NotificationRoleEntity";
 
 export default {
-	liveRolesTop: (liveRoles: LiveRoleEntity[], roles: Collection<string, Role>) => {
+	notificationRolesList: (
+		liveRoles: NotificationRoleEntity[],
+		roles: Collection<string, Role>,
+		channels: Collection<string, Channel>
+	) => {
+		return new MessageEmbed()
+			.setTitle("Notification roles")
+			.addFields([
+				{
+					name: "> Role",
+					value: liveRoles
+						.map((x) => roles.get(x.roleId)?.toString() ?? `<@&${x.roleId}>`)
+						.join("\n"),
+					inline: true,
+				},
+				{
+					name: "> Channel",
+					value: liveRoles
+						.map((x) => channels.get(x.channelId)?.toString() ?? `<#${x.channelId}>`)
+						.join("\n"),
+					inline: true,
+				},
+				{
+					name: "> Created at",
+					value: liveRoles.map((x) => `<t:${x.createdAt}:R>`).join("\n"),
+					inline: true,
+				},
+			])
+			.setColor("#2f3136");
+	},
+	liveRolesList: (liveRoles: LiveRoleEntity[], roles: Collection<string, Role>) => {
 		return new MessageEmbed()
 			.setTitle("Live roles")
 			.addFields([
@@ -63,14 +94,13 @@ export default {
 	},
 	randomSteamer: (stream: Activity, chosen: GuildMember) => {
 		const streamTitle = `**[${stream.details ?? `${chosen.user.tag} Stream`}](${stream.url ?? ""})**`;
-		const twitchUsername = stream.assets?.largeImage?.split(":")[1];
 
 		return new MessageEmbed()
 			.setTitle("🥳 We got our random streamer!")
 			.setColor("#2f3136")
 			.setDescription(`${streamTitle} \n` + `**Category:** *${stream.state ?? "Unknown category"}*`)
 			.setThumbnail(chosen.user.avatarURL() ?? "")
-			.setImage(`https://static-cdn.jtvnw.net/previews-ttv/live_user_${twitchUsername}-1280x720.jpg`)
+			.setImage(stream.assets?.largeImageURL() ?? "")
 			.addFields([
 				{
 					name: "> Member",
@@ -85,7 +115,7 @@ export default {
 			]);
 	},
 	randomStreamersHistory: (
-		history: chooseHistoryEntity[],
+		history: ChooseHistoryEntity[],
 		members: Collection<string, GuildMember>,
 		roles: Collection<string, Role>
 	) => {
