@@ -1,7 +1,7 @@
-import { getCustomRepository, getRepository } from "typeorm";
+import { getRepository } from "typeorm";
 import { UserEntity } from "../entities/User";
 import { client } from "../libs/discord";
-import { CustomSettingsRepository } from "../entities/Settings";
+import getSettings from "../helpers/getSettings";
 
 export default async () => {
 	const userRepository = getRepository(UserEntity);
@@ -13,7 +13,7 @@ export default async () => {
 		},
 	});
 	if (!user) return;
-	const settings = await getCustomRepository(CustomSettingsRepository).findOneOrCreate();
+	const settings = await getSettings();
 	const roleMembers = guild.roles.cache
 		.get(settings.mostActiveMemberRoleId)
 		?.members.filter((x) => x.id !== user.id);

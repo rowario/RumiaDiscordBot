@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import findConfig from "find-config";
 import { createConnection } from "typeorm";
 import path from "path";
-import { runBot } from "./libs/discord";
+import { run } from "./libs/discord";
 
 config({
 	path: findConfig(".env") ?? "../.env",
@@ -16,7 +16,7 @@ async function bootstrap() {
 		entities: [path.join(__dirname, "./entities/*.{ts,js}")],
 		useUnifiedTopology: true,
 	});
-	await runBot();
+	await run();
 }
 
 bootstrap().then(() => console.log("App started!"));

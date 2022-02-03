@@ -143,12 +143,16 @@ export default {
 	settings: (settings: SettingsEntity, roles: Collection<string, Role>) => {
 		return new MessageEmbed().setTitle("RumiaBot settings.").addFields([
 			{
-				name: "Moderator role: ",
-				value: `> ${roles.get(settings.moderatorRoleId)?.toString() ?? "Not set yet."}`,
+				name: "> Moderator role",
+				value: ` ${roles.get(settings.moderatorRoleId)?.toString() ?? "Not set yet."}`,
 			},
 			{
-				name: "Most active member role: ",
-				value: `> ${roles.get(settings.mostActiveMemberRoleId)?.toString() ?? "Not set yet."}`,
+				name: "> Most active member role",
+				value: ` ${roles.get(settings.mostActiveMemberRoleId)?.toString() ?? "Not set yet."}`,
+			},
+			{
+				name: "Scam ignored roles",
+				value: settings.scamIgnore.map((x) => `${roles.get(x)?.toString() ?? `<@&${x}>`}`).join(","),
 			},
 		]);
 	},

@@ -6,6 +6,9 @@ export class SettingsEntity {
 	_id!: ObjectID;
 
 	@Column()
+	scamIgnore!: string[];
+
+	@Column()
 	moderatorRoleId!: string;
 
 	@Column()

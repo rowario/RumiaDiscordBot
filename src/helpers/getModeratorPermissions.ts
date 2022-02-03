@@ -1,9 +1,8 @@
-import { getCustomRepository } from "typeorm";
-import { CustomSettingsRepository } from "../entities/Settings";
 import { ApplicationCommandPermissions } from "discord.js";
+import getSettings from "./getSettings";
 
 export default async (): Promise<ApplicationCommandPermissions[]> => {
-	const settings = await getCustomRepository(CustomSettingsRepository).findOneOrCreate();
+	const settings = await getSettings();
 
 	return [
 		{
