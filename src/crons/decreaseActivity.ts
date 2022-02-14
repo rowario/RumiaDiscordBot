@@ -11,14 +11,15 @@ export default () => {
 					$gt: 0,
 				},
 				lastTick: {
-					$lt: dayjs().unix() - 60,
+					$lt: dayjs().unix() - 3600,
 				},
 			},
 		})
 		.then(async (users) => {
 			for (const user of users) {
 				user.activity--;
-				user.lastTick += 600;
+				if (user.overallActivity > 0) user.overallActivity--;
+				user.lastTick += 3600;
 				await userRepository.save(user);
 			}
 		});

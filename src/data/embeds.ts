@@ -3,11 +3,11 @@ import { LiveRoleEntity } from "../entities/LiveRole";
 import { UserEntity } from "../entities/User";
 import { ChooseHistoryEntity } from "../entities/ChooseHistory";
 import { SettingsEntity } from "../entities/Settings";
-import { NotificationRoleEntity } from "../entities/NotificationRoleEntity";
+import { NotificationRole } from "../entities/NotificationRole";
 
 export default {
 	notificationRolesList: (
-		liveRoles: NotificationRoleEntity[],
+		liveRoles: NotificationRole[],
 		roles: Collection<string, Role>,
 		channels: Collection<string, Channel>
 	) => {
@@ -81,7 +81,7 @@ export default {
 				},
 				{
 					name: "> Activity value",
-					value: users.map((x) => x.activity).join("\n"),
+					value: users.map((x) => `${x.overallActivity} (${x.activity})`).join("\n"),
 					inline: true,
 				},
 				{
@@ -112,7 +112,8 @@ export default {
 					value: stream.url ?? "",
 					inline: true,
 				},
-			]);
+			])
+			.setColor("#2f3136");
 	},
 	randomStreamersHistory: (
 		history: ChooseHistoryEntity[],
@@ -121,7 +122,6 @@ export default {
 	) => {
 		return new MessageEmbed()
 			.setTitle("Random streamers history.")
-			.setColor("#2f3136")
 			.addFields([
 				{
 					name: "> Member",
@@ -138,22 +138,38 @@ export default {
 					inline: true,
 				},
 				{ name: "> Date", value: history.map((x) => `<t:${x.date}:R>`).join("\n"), inline: true },
-			]);
+			])
+			.setColor("#2f3136");
 	},
 	settings: (settings: SettingsEntity, roles: Collection<string, Role>) => {
-		return new MessageEmbed().setTitle("RumiaBot settings.").addFields([
-			{
-				name: "> Moderator role",
-				value: ` ${roles.get(settings.moderatorRoleId)?.toString() ?? "Not set yet."}`,
-			},
-			{
-				name: "> Most active member role",
-				value: ` ${roles.get(settings.mostActiveMemberRoleId)?.toString() ?? "Not set yet."}`,
-			},
-			{
-				name: "Scam ignored roles",
-				value: settings.scamIgnore.map((x) => `${roles.get(x)?.toString() ?? `<@&${x}>`}`).join(","),
-			},
-		]);
+		return new MessageEmbed()
+			.setTitle("RumiaBot settings.")
+			.addFields([
+				{
+					name: "> Moderator role",
+					value: `${roles.get(settings.moderatorRoleId)?.toString() ?? "Not set yet."}`,
+					inline: true,
+				},
+				{
+					name: "> Active member role",
+					value: `${roles.get(settings.activeRoleId)?.toString() ?? "Not set yet."}`,
+					inline: true,
+				},
+				{
+					name: "> Most active member role",
+					value: `${roles.get(settings.mostActiveMemberRoleId)?.toString() ?? "Not set yet."}`,
+					inline: true,
+				},
+				{
+					name: "> Scam ignored roles",
+					value: settings.scamIgnore.length
+						? settings.scamIgnore
+								.map((x) => `${roles.get(x)?.toString() ?? `<@&${x}>`}`)
+								.join(",")
+						: "Not set any roles yet.",
+					inline: true,
+				},
+			])
+			.setColor("#2f3136");
 	},
 };

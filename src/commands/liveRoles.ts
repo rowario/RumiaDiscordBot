@@ -7,11 +7,12 @@ import dayjs from "dayjs";
 import embeds from "../data/embeds";
 
 @Discord()
-@SlashGroup("live", "Live roles management.")
+@SlashGroup({ name: "live", description: "Live roles management" })
 @Permission(false)
 @Permission(getDefaultPermissions)
 class LiveRoles {
-	@Slash("list")
+	@Slash("list", { description: "Shows all live roles" })
+	@SlashGroup({ name: "live" })
 	async list(interaction: CommandInteraction<"cached">) {
 		const liveRoles = await getRepository(LiveRoleEntity).find({});
 		if (liveRoles.length) {
@@ -25,7 +26,8 @@ class LiveRoles {
 		} else await interaction.reply("You have not created any Live roles!");
 	}
 
-	@Slash("add")
+	@Slash("add", { description: "Adds new live role" })
+	@SlashGroup({ name: "live" })
 	async add(
 		@SlashOption("role", { description: "Role." }) role: Role,
 		@SlashOption("live_role", { description: "Live role." }) liveRole: Role,
@@ -45,7 +47,8 @@ class LiveRoles {
 		});
 	}
 
-	@Slash("delete")
+	@Slash("delete", { description: "Deletes live role" })
+	@SlashGroup({ name: "live" })
 	async delete(
 		@SlashOption("name", {
 			autocomplete: async (interaction: AutocompleteInteraction): Promise<void> => {

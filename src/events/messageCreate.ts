@@ -17,15 +17,15 @@ class MessageCreate {
 		const userRepository = getCustomRepository(CustomUserRepository);
 		const user = await userRepository.findOneOrCreate({ id }, { id });
 
-		if (
-			(this.messagesHistory.has(id) && (this.messagesHistory.get(id) ?? 0) > dayjs().unix() - 20) ||
-			user.activity >= 144
-		)
-			return;
-
+		if (this.messagesHistory.has(id) && (this.messagesHistory.get(id) ?? 0) > dayjs().unix() - 20) return;
 		this.messagesHistory.set(id, dayjs().unix());
-		user.activity++;
-		user.lastTick = dayjs().unix();
+
+		if (user.activity < 200) {
+			user.activity += 4;
+			user.lastTick = dayjs().unix();
+		}
+
+		user.overallActivity++;
 		await userRepository.save(user);
 	}
 

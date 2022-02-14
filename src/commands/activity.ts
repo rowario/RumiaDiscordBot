@@ -5,19 +5,21 @@ import { UserEntity } from "../entities/User";
 import dayjs from "dayjs";
 import getDefaultPermissions from "../helpers/getDefaultPermissions";
 import embeds from "../data/embeds";
+import timer from "../utils/timer";
 
 @Discord()
-@SlashGroup("activity")
+@SlashGroup({ name: "activity" })
 @Permission(false)
 @Permission(getDefaultPermissions)
 class Activity {
-	@Slash("top")
+	@Slash("top", { description: "Shows top 10 members by activity" })
+	@SlashGroup({ name: "activity" })
 	async top(interaction: CommandInteraction<"cached">) {
 		const users = await getRepository(UserEntity).find({
 			order: {
-				activity: -1,
+				overallActivity: -1,
 			},
-			take: 9,
+			take: 10,
 		});
 		const {
 			guild: {
@@ -28,7 +30,8 @@ class Activity {
 		await interaction.reply({ embeds: [embeds.activityTop(users, membersCache)] });
 	}
 
-	@Slash("reset")
+	@Slash("reset", { description: "Resets all the activity top" })
+	@SlashGroup({ name: "activity" })
 	async reset(interaction: CommandInteraction<"cached">) {
 		if (!interaction.channel) return;
 		await interaction.reply({
@@ -42,14 +45,16 @@ class Activity {
 		});
 		collector.on("collect", async (message) => {
 			if (message.content === "reset") {
+				if (message.deletable) await message.delete();
+				await timer(1000);
 				await getRepository(UserEntity).update(
 					{},
 					{
 						activity: 0,
+						overallActivity: 0,
 						lastTick: dayjs().unix(),
 					}
 				);
-				if (message.deletable) await message.delete();
 				await interaction.editReply("Activity top successfully cleared!");
 				await collector.stop("Activity top successfully cleared!");
 			} else await collector.stop("Wrong message passed!");

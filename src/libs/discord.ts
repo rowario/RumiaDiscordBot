@@ -15,5 +15,8 @@ export const client = new Client({
 
 export async function run() {
 	await importx(path.join(__dirname, "../{commands,events}/*.{ts,js}"));
-	await client.login(process.env["DISCORD_TOKEN"] ?? "");
+
+	if (!process.env["DISCORD_TOKEN"])
+		throw new Error("You have not installed your Discord Token!\nCheck your .env file!");
+	await client.login(process.env["DISCORD_TOKEN"]);
 }

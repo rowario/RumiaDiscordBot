@@ -7,10 +7,16 @@ class Ready {
 	@On("ready")
 	async ready([readyClient]: ArgsOf<"ready">) {
 		await client.guilds.fetch();
+		await client.initApplicationCommands({
+			global: {
+				log: true,
+			},
+			guild: {
+				log: true,
+			},
+		});
+		await client.initApplicationPermissions(true);
 
-		// await client.clearApplicationCommands(...client.guilds.cache.map((x) => x.id));
-		await client.initApplicationCommands();
-		await client.initApplicationPermissions();
 
 		readyClient.user.setActivity({
 			type: "STREAMING",

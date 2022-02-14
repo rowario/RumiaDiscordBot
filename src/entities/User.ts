@@ -12,7 +12,7 @@ export class UserEntity {
 	activity: number = 0;
 
 	@Column()
-	last_tick: number = 0;
+	overallActivity: number = 0;
 
 	@Column()
 	lastTick: number = 0;

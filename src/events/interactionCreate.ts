@@ -12,6 +12,10 @@ class InteractionCreate {
 		} = interaction;
 		await getCustomRepository(CustomUserRepository).findOneOrCreate({ id }, { id });
 
-		client.executeInteraction(interaction);
+		try {
+			await client.executeInteraction(interaction);
+		} catch (e) {
+			console.log(`Got an error here :(\nMessage: \n${e}`);
+		}
 	}
 }

@@ -12,6 +12,12 @@ export class SettingsEntity {
 	moderatorRoleId!: string;
 
 	@Column()
+	minimumActivity: number = 50;
+
+	@Column()
+	activeRoleId!: string;
+
+	@Column()
 	mostActiveMemberRoleId!: string;
 }
 

@@ -1,7 +1,7 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
 
 @Entity("notification_role")
-export class NotificationRoleEntity {
+export class NotificationRole {
 	@ObjectIdColumn()
 	_id!: ObjectID;
 

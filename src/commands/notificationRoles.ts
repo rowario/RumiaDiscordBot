@@ -4,16 +4,17 @@ import { getRepository } from "typeorm";
 import getDefaultPermissions from "../helpers/getDefaultPermissions";
 import dayjs from "dayjs";
 import embeds from "../data/embeds";
-import { NotificationRoleEntity } from "../entities/NotificationRoleEntity";
+import { NotificationRole } from "../entities/NotificationRole";
 
 @Discord()
-@SlashGroup("notifications", "Notification roles management.")
 @Permission(false)
 @Permission(getDefaultPermissions)
+@SlashGroup({ name: "notifications", description: "Notification roles management." })
 class LiveRoles {
-	@Slash("list")
+	@Slash("list", { description: "Shows all notification roles" })
+	@SlashGroup({ name: "notifications" })
 	async list(interaction: CommandInteraction<"cached">) {
-		const notificationRoles = await getRepository(NotificationRoleEntity).find({});
+		const notificationRoles = await getRepository(NotificationRole).find({});
 		if (notificationRoles.length) {
 			const {
 				guild: {
@@ -28,13 +29,14 @@ class LiveRoles {
 		} else await interaction.reply("You have not created any Notification roles!");
 	}
 
-	@Slash("add")
+	@Slash("add", { description: "Adds new notification role" })
+	@SlashGroup({ name: "notifications" })
 	async add(
 		@SlashOption("role", { description: "Role." }) role: Role,
 		@SlashOption("channel", { description: "Live role." }) channel: Channel,
 		interaction: CommandInteraction
 	) {
-		const notificationRoleRepository = getRepository(NotificationRoleEntity);
+		const notificationRoleRepository = getRepository(NotificationRole);
 		await notificationRoleRepository.save(
 			notificationRoleRepository.create({
 				roleId: role.id,
@@ -48,11 +50,12 @@ class LiveRoles {
 		});
 	}
 
-	@Slash("delete")
+	@Slash("delete", { description: "Deletes notification role" })
+	@SlashGroup({ name: "notifications" })
 	async delete(
 		@SlashOption("name", {
 			autocomplete: async (interaction: AutocompleteInteraction): Promise<void> => {
-				const roles = await getRepository(NotificationRoleEntity).find({});
+				const roles = await getRepository(NotificationRole).find({});
 
 				await interaction.respond(
 					roles.map((x) => ({
@@ -66,7 +69,7 @@ class LiveRoles {
 		roleId: string,
 		interaction: CommandInteraction
 	) {
-		const notificationRoleRepository = getRepository(NotificationRoleEntity);
+		const notificationRoleRepository = getRepository(NotificationRole);
 		const role = await notificationRoleRepository.findOne({ roleId });
 		if (!role) {
 			await interaction.reply({

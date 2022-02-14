@@ -1,15 +1,15 @@
 import { getRepository } from "typeorm";
-import { NotificationRoleEntity } from "../entities/NotificationRoleEntity";
+import { NotificationRole } from "../entities/NotificationRole";
 import { client } from "../libs/discord";
-import { LiveNotificationEntity } from "../entities/LiveNotificationEntity";
+import { LiveNotification } from "../entities/LiveNotification";
 import dayjs from "dayjs";
 
 export default async () => {
 	const guild = client.guilds.cache.get(process.env["GUILD_ID"] ?? "");
 	if (!guild) return;
 
-	const notificationRoles = await getRepository(NotificationRoleEntity).find({});
-	const liveNotificationRepository = getRepository(LiveNotificationEntity);
+	const notificationRoles = await getRepository(NotificationRole).find({});
+	const liveNotificationRepository = getRepository(LiveNotification);
 
 	for (const notificationRole of notificationRoles) {
 		const channel = guild.channels.cache.get(notificationRole.channelId);
@@ -38,9 +38,7 @@ export default async () => {
 
 		for (const streamer of streamers.values()) {
 			if (!streamer.presence) continue;
-			const stream = streamer.presence.activities.filter(
-				(x) => x.type === "STREAMING" && x.name === "Twitch"
-			)[0];
+			const stream = streamer.presence.activities.filter((x) => x.type === "STREAMING")[0];
 			if (!stream) continue;
 			await liveNotificationRepository.save(
 				liveNotificationRepository.create({

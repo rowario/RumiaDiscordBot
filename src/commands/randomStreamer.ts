@@ -8,12 +8,13 @@ import getModeratorPermissions from "../helpers/getModeratorPermissions";
 import embeds from "../data/embeds";
 
 @Discord()
-@SlashGroup("random")
 @Permission(false)
 @Permission(getDefaultPermissions)
 @Permission(getModeratorPermissions)
+@SlashGroup({ name: "random" })
 class RandomStreamer {
-	@Slash("get")
+	@Slash("get", { description: "Found 1 random streamer by role" })
+	@SlashGroup({ name: "random" })
 	async get(@SlashOption("role") role: Role, interaction: CommandInteraction) {
 		const chosenRepository = getRepository(ChooseHistoryEntity);
 		const alreadyChosen = (
@@ -29,7 +30,11 @@ class RandomStreamer {
 		const members = role.members
 			.filter((x) => {
 				if (!x.presence?.activities) return false;
-				return x.presence.activities.filter((j) => j.type === "STREAMING").length > 0;
+				return (
+					x.presence.activities.filter(
+						(j) => j.type === "STREAMING" && j.name === "Twitch" && j.url
+					).length > 0
+				);
 			})
 			.filter((x) => {
 				return alreadyChosen.indexOf(x.id) === -1;
@@ -66,7 +71,8 @@ class RandomStreamer {
 		}
 	}
 
-	@Slash("history")
+	@Slash("history", { description: "Shows history of previous random streamers" })
+	@SlashGroup({ name: "random" })
 	async history(interaction: CommandInteraction<"cached">) {
 		const history = await getRepository(ChooseHistoryEntity).find({
 			order: {
@@ -92,7 +98,8 @@ class RandomStreamer {
 		});
 	}
 
-	@Slash("clear")
+	@Slash("clear", { description: "Clears random streamers history" })
+	@SlashGroup({ name: "random" })
 	async clear(interaction: CommandInteraction) {
 		await getRepository(ChooseHistoryEntity).delete({});
 		await interaction.reply({
