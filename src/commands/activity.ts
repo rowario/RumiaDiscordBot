@@ -1,19 +1,16 @@
-import { Discord, Permission, Slash, SlashGroup } from "discordx";
+import { Discord, Slash, SlashGroup } from "discordx";
 import { CommandInteraction, MessageCollector } from "discord.js";
 import { getRepository } from "typeorm";
 import { UserEntity } from "../entities/User";
 import dayjs from "dayjs";
-import getDefaultPermissions from "../helpers/getDefaultPermissions";
 import embeds from "../data/embeds";
 import timer from "../utils/timer";
 
 @Discord()
 @SlashGroup({ name: "activity" })
-@Permission(false)
-@Permission(getDefaultPermissions)
 class Activity {
 	@Slash("top", { description: "Shows top 10 members by activity" })
-	@SlashGroup({ name: "activity" })
+	@SlashGroup("activity")
 	async top(interaction: CommandInteraction<"cached">) {
 		const users = await getRepository(UserEntity).find({
 			order: {
@@ -31,7 +28,7 @@ class Activity {
 	}
 
 	@Slash("reset", { description: "Resets all the activity top" })
-	@SlashGroup({ name: "activity" })
+	@SlashGroup("activity")
 	async reset(interaction: CommandInteraction<"cached">) {
 		if (!interaction.channel) return;
 		await interaction.reply({
@@ -56,8 +53,8 @@ class Activity {
 					}
 				);
 				await interaction.editReply("Activity top successfully cleared!");
-				await collector.stop("Activity top successfully cleared!");
-			} else await collector.stop("Wrong message passed!");
+				collector.stop("Activity top successfully cleared!");
+			} else collector.stop("Wrong message passed!");
 		});
 	}
 }

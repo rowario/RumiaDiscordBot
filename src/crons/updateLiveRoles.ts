@@ -1,3 +1,4 @@
+import { ActivityType } from "discord.js";
 import { getRepository } from "typeorm";
 import { LiveRoleEntity } from "../entities/LiveRole";
 import { client } from "../libs/discord";
@@ -12,7 +13,7 @@ export default async (): Promise<void> => {
 			if (members && members.size > 0) {
 				const streamers = members.filter((x) => {
 					if (!x.presence || !x.presence.activities) return false;
-					return x.presence.activities.filter((j) => j.type === "STREAMING").length > 0;
+					return x.presence.activities.filter((j) => j.type === ActivityType.Streaming).length > 0;
 				});
 
 				for (const streamer of streamers.values()) {
@@ -25,7 +26,7 @@ export default async (): Promise<void> => {
 			if (liveMembers && liveMembers.size > 0) {
 				const streamers = liveMembers.filter((x) => {
 					if (!x.presence || !x.presence.activities) return true;
-					return x.presence.activities.filter((j) => j.type === "STREAMING").length < 1;
+					return x.presence.activities.filter((j) => j.type === ActivityType.Streaming).length < 1;
 				});
 
 				for (const streamer of streamers.values()) {

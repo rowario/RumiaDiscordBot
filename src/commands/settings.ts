@@ -1,21 +1,17 @@
-import { Discord, Permission, Slash, SlashGroup, SlashOption } from "discordx";
-import { AutocompleteInteraction, CommandInteraction, Role } from "discord.js";
-import getDefaultPermissions from "../helpers/getDefaultPermissions";
+import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, Role } from "discord.js";
 import { getRepository } from "typeorm";
 import { SettingsEntity } from "../entities/Settings";
-import { client } from "../libs/discord";
 import embeds from "../data/embeds";
 import getSettings, { updateSettings } from "../helpers/getSettings";
 
 @Discord()
-@Permission(false)
-@Permission(getDefaultPermissions)
 @SlashGroup({ name: "settings", description: "Bot settings" })
 @SlashGroup({ name: "set_role", description: "Roles management", root: "settings" })
 @SlashGroup({ name: "scam_ignored", description: "Scam links ignored roles management", root: "settings" })
 class Settings {
 	@Slash("info", { description: "Current settings information" })
-	@SlashGroup({ name: "settings" })
+	@SlashGroup("settings")
 	async settings(interaction: CommandInteraction<"cached">) {
 		const settings = await getSettings();
 		const {
@@ -26,7 +22,7 @@ class Settings {
 	}
 
 	@Slash("moderator", { description: "Sets moderator role" })
-	@SlashGroup({ name: "set_role", root: "settings" })
+	@SlashGroup("settings")
 	async setModeratorRole(@SlashOption("role") role: Role, interaction: CommandInteraction) {
 		await getRepository(SettingsEntity).update(
 			{},
@@ -35,12 +31,11 @@ class Settings {
 			}
 		);
 		await updateSettings();
-		await client.initApplicationPermissions();
 		await interaction.reply(`${role.name} role successfully set as Moderator role!`);
 	}
 
 	@Slash("active", { description: "Sets Active member role" })
-	@SlashGroup({ name: "set_role", root: "settings" })
+	@SlashGroup("settings")
 	async setActiveRole(@SlashOption("role") role: Role, interaction: CommandInteraction) {
 		await getRepository(SettingsEntity).update(
 			{},
@@ -53,7 +48,7 @@ class Settings {
 	}
 
 	@Slash("most_active", { description: "Sets Most active member role" })
-	@SlashGroup({ name: "set_role", root: "settings" })
+	@SlashGroup("settings")
 	async setMostActiveRole(@SlashOption("role") role: Role, interaction: CommandInteraction) {
 		await getRepository(SettingsEntity).update(
 			{},
@@ -66,7 +61,7 @@ class Settings {
 	}
 
 	@Slash("add", { description: "Adds role to scam links remover ignored roles list" })
-	@SlashGroup({ name: "scam_ignored", root: "settings" })
+	@SlashGroup("settings")
 	async add(@SlashOption("role") role: Role, interaction: CommandInteraction<"cached">) {
 		await interaction.deferReply({
 			ephemeral: true,
@@ -86,7 +81,7 @@ class Settings {
 	}
 
 	@Slash("remove", { description: "Removes role from scam links remover ignored roles list" })
-	@SlashGroup({ name: "scam_ignored", root: "settings" })
+	@SlashGroup("settings")
 	async remove(
 		@SlashOption("name", {
 			autocomplete: async (interaction: AutocompleteInteraction): Promise<void> => {
@@ -99,7 +94,7 @@ class Settings {
 					}))
 				);
 			},
-			type: "STRING",
+			type: ApplicationCommandOptionType.String,
 		})
 		removeRoleId: string,
 		interaction: CommandInteraction<"cached">

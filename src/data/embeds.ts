@@ -1,9 +1,10 @@
-import { Activity, Channel, Collection, GuildMember, MessageEmbed, Role } from "discord.js";
+import { Activity, Channel, Collection, GuildMember, Role } from "discord.js";
 import { LiveRoleEntity } from "../entities/LiveRole";
 import { UserEntity } from "../entities/User";
 import { ChooseHistoryEntity } from "../entities/ChooseHistory";
 import { SettingsEntity } from "../entities/Settings";
 import { NotificationRole } from "../entities/NotificationRole";
+import { EmbedBuilder } from "@discordjs/builders";
 
 export default {
 	notificationRolesList: (
@@ -11,7 +12,7 @@ export default {
 		roles: Collection<string, Role>,
 		channels: Collection<string, Channel>
 	) => {
-		return new MessageEmbed()
+		return new EmbedBuilder()
 			.setTitle("Notification roles")
 			.addFields([
 				{
@@ -34,10 +35,10 @@ export default {
 					inline: true,
 				},
 			])
-			.setColor("#2f3136");
+			.setColor(0x2f3136);
 	},
 	liveRolesList: (liveRoles: LiveRoleEntity[], roles: Collection<string, Role>) => {
-		return new MessageEmbed()
+		return new EmbedBuilder()
 			.setTitle("Live roles")
 			.addFields([
 				{
@@ -60,12 +61,12 @@ export default {
 					inline: true,
 				},
 			])
-			.setColor("#2f3136");
+			.setColor(0x2f3136);
 	},
 	activityTop: (users: UserEntity[], members: Collection<string, GuildMember>) => {
 		const medals = ["🥇", "🥈", "🥉"];
 
-		return new MessageEmbed()
+		return new EmbedBuilder()
 			.setTitle("Activity top")
 			.addFields([
 				{
@@ -90,14 +91,14 @@ export default {
 					inline: true,
 				},
 			])
-			.setColor("#2f3136");
+			.setColor(0x2f3136);
 	},
 	randomSteamer: (stream: Activity, chosen: GuildMember) => {
 		const streamTitle = `**[${stream.details ?? `${chosen.user.tag} Stream`}](${stream.url ?? ""})**`;
 
-		return new MessageEmbed()
+		return new EmbedBuilder()
 			.setTitle("🥳 We got our random streamer!")
-			.setColor("#2f3136")
+			.setColor(0x2f3136)
 			.setDescription(`${streamTitle} \n` + `**Category:** *${stream.state ?? "Unknown category"}*`)
 			.setThumbnail(chosen.user.avatarURL() ?? "")
 			.setImage(stream.assets?.largeImageURL() ?? "")
@@ -113,14 +114,14 @@ export default {
 					inline: true,
 				},
 			])
-			.setColor("#2f3136");
+			.setColor(0x2f3136);
 	},
 	randomStreamersHistory: (
 		history: ChooseHistoryEntity[],
 		members: Collection<string, GuildMember>,
 		roles: Collection<string, Role>
 	) => {
-		return new MessageEmbed()
+		return new EmbedBuilder()
 			.setTitle("Random streamers history.")
 			.addFields([
 				{
@@ -139,10 +140,10 @@ export default {
 				},
 				{ name: "> Date", value: history.map((x) => `<t:${x.date}:R>`).join("\n"), inline: true },
 			])
-			.setColor("#2f3136");
+			.setColor(0x2f3136);
 	},
 	settings: (settings: SettingsEntity, roles: Collection<string, Role>) => {
-		return new MessageEmbed()
+		return new EmbedBuilder()
 			.setTitle("RumiaBot settings.")
 			.addFields([
 				{
@@ -170,6 +171,6 @@ export default {
 					inline: true,
 				},
 			])
-			.setColor("#2f3136");
+			.setColor(0x2f3136);
 	},
 };

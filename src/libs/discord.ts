@@ -1,14 +1,14 @@
 import { Client } from "discordx";
-import { Intents } from "discord.js";
 import { importx } from "@discordx/importer";
 import path from "path";
+import { GatewayIntentBits } from "discord.js";
 
 export const client = new Client({
 	intents: [
-		Intents.FLAGS.GUILDS,
-		Intents.FLAGS.GUILD_MESSAGES,
-		Intents.FLAGS.GUILD_MEMBERS,
-		Intents.FLAGS.GUILD_PRESENCES,
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildPresences,
 	],
 	botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
 });

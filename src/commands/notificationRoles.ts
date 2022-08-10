@@ -1,18 +1,21 @@
-import { Discord, Permission, Slash, SlashGroup, SlashOption } from "discordx";
-import { AutocompleteInteraction, Channel, CommandInteraction, Role } from "discord.js";
+import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
+import {
+	ApplicationCommandOptionType,
+	AutocompleteInteraction,
+	Channel,
+	CommandInteraction,
+	Role,
+} from "discord.js";
 import { getRepository } from "typeorm";
-import getDefaultPermissions from "../helpers/getDefaultPermissions";
 import dayjs from "dayjs";
 import embeds from "../data/embeds";
 import { NotificationRole } from "../entities/NotificationRole";
 
 @Discord()
-@Permission(false)
-@Permission(getDefaultPermissions)
 @SlashGroup({ name: "notifications", description: "Notification roles management." })
 class LiveRoles {
 	@Slash("list", { description: "Shows all notification roles" })
-	@SlashGroup({ name: "notifications" })
+	@SlashGroup("notifications")
 	async list(interaction: CommandInteraction<"cached">) {
 		const notificationRoles = await getRepository(NotificationRole).find({});
 		if (notificationRoles.length) {
@@ -30,10 +33,11 @@ class LiveRoles {
 	}
 
 	@Slash("add", { description: "Adds new notification role" })
-	@SlashGroup({ name: "notifications" })
+	@SlashGroup("notifications")
 	async add(
 		@SlashOption("role", { description: "Role." }) role: Role,
-		@SlashOption("channel", { description: "Live role." }) channel: Channel,
+		@SlashOption("channel", { description: "Live role.", type: ApplicationCommandOptionType.Channel })
+		channel: Channel,
 		interaction: CommandInteraction
 	) {
 		const notificationRoleRepository = getRepository(NotificationRole);
@@ -51,7 +55,7 @@ class LiveRoles {
 	}
 
 	@Slash("delete", { description: "Deletes notification role" })
-	@SlashGroup({ name: "notifications" })
+	@SlashGroup("notifications")
 	async delete(
 		@SlashOption("name", {
 			autocomplete: async (interaction: AutocompleteInteraction): Promise<void> => {
@@ -64,7 +68,7 @@ class LiveRoles {
 					}))
 				);
 			},
-			type: "STRING",
+			type: ApplicationCommandOptionType.String,
 		})
 		roleId: string,
 		interaction: CommandInteraction

@@ -1,3 +1,4 @@
+import { ActivityType } from "discord.js";
 import { ArgsOf, Discord, On } from "discordx";
 import { runCrons } from "../crons";
 import { client } from "../libs/discord";
@@ -15,11 +16,9 @@ class Ready {
 				log: true,
 			},
 		});
-		await client.initApplicationPermissions(true);
-
 
 		readyClient.user.setActivity({
-			type: "STREAMING",
+			type: ActivityType.Streaming,
 			name: "Coding",
 			url: "https://www.twitch.tv/rowario",
 		});

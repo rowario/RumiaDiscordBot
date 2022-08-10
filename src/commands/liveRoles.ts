@@ -1,18 +1,15 @@
-import { Discord, Permission, Slash, SlashGroup, SlashOption } from "discordx";
-import { AutocompleteInteraction, CommandInteraction, Role } from "discord.js";
+import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
+import { ApplicationCommandOptionType, AutocompleteInteraction, CommandInteraction, Role } from "discord.js";
 import { getRepository } from "typeorm";
 import { LiveRoleEntity } from "../entities/LiveRole";
-import getDefaultPermissions from "../helpers/getDefaultPermissions";
 import dayjs from "dayjs";
 import embeds from "../data/embeds";
 
 @Discord()
 @SlashGroup({ name: "live", description: "Live roles management" })
-@Permission(false)
-@Permission(getDefaultPermissions)
 class LiveRoles {
 	@Slash("list", { description: "Shows all live roles" })
-	@SlashGroup({ name: "live" })
+	@SlashGroup("live")
 	async list(interaction: CommandInteraction<"cached">) {
 		const liveRoles = await getRepository(LiveRoleEntity).find({});
 		if (liveRoles.length) {
@@ -27,7 +24,7 @@ class LiveRoles {
 	}
 
 	@Slash("add", { description: "Adds new live role" })
-	@SlashGroup({ name: "live" })
+	@SlashGroup("live")
 	async add(
 		@SlashOption("role", { description: "Role." }) role: Role,
 		@SlashOption("live_role", { description: "Live role." }) liveRole: Role,
@@ -48,7 +45,7 @@ class LiveRoles {
 	}
 
 	@Slash("delete", { description: "Deletes live role" })
-	@SlashGroup({ name: "live" })
+	@SlashGroup("live")
 	async delete(
 		@SlashOption("name", {
 			autocomplete: async (interaction: AutocompleteInteraction): Promise<void> => {
@@ -61,7 +58,7 @@ class LiveRoles {
 					}))
 				);
 			},
-			type: "STRING",
+			type: ApplicationCommandOptionType.String,
 		})
 		liveRoleId: string,
 		interaction: CommandInteraction

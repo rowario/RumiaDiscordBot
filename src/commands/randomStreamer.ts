@@ -1,20 +1,16 @@
-import { Discord, Permission, Slash, SlashGroup, SlashOption } from "discordx";
-import { CommandInteraction, MessageActionRow, MessageButton, Role } from "discord.js";
+import { Discord, Slash, SlashGroup, SlashOption } from "discordx";
+import { ActionRowBuilder, ActivityType, ButtonStyle, CommandInteraction, Role } from "discord.js";
 import { getRepository } from "typeorm";
 import { ChooseHistoryEntity } from "../entities/ChooseHistory";
 import dayjs from "dayjs";
-import getDefaultPermissions from "../helpers/getDefaultPermissions";
-import getModeratorPermissions from "../helpers/getModeratorPermissions";
 import embeds from "../data/embeds";
+import { ButtonBuilder } from "@discordjs/builders";
 
 @Discord()
-@Permission(false)
-@Permission(getDefaultPermissions)
-@Permission(getModeratorPermissions)
 @SlashGroup({ name: "random" })
 class RandomStreamer {
 	@Slash("get", { description: "Found 1 random streamer by role" })
-	@SlashGroup({ name: "random" })
+	@SlashGroup("random")
 	async get(@SlashOption("role") role: Role, interaction: CommandInteraction) {
 		const chosenRepository = getRepository(ChooseHistoryEntity);
 		const alreadyChosen = (
@@ -32,7 +28,7 @@ class RandomStreamer {
 				if (!x.presence?.activities) return false;
 				return (
 					x.presence.activities.filter(
-						(j) => j.type === "STREAMING" && j.name === "Twitch" && j.url
+						(j) => j.type === ActivityType.Streaming && j.name === "Twitch" && j.url
 					).length > 0
 				);
 			})
@@ -43,7 +39,7 @@ class RandomStreamer {
 		let chosen = members.random();
 		if (members.size > 0 && chosen && chosen.presence) {
 			const stream = chosen.presence.activities.filter(
-				(x) => x.type === "STREAMING" && x.name === "Twitch"
+				(x) => x.type === ActivityType.Streaming && x.name === "Twitch"
 			)[0];
 
 			await chosenRepository.save(
@@ -54,14 +50,14 @@ class RandomStreamer {
 				})
 			);
 
-			const button = new MessageButton()
+			const button = new ButtonBuilder()
 				.setURL(stream.url ?? "")
-				.setStyle("LINK")
+				.setStyle(ButtonStyle.Link)
 				.setLabel("Twitch channel");
 
 			await interaction.reply({
 				embeds: [embeds.randomSteamer(stream, chosen)],
-				components: [new MessageActionRow({ components: [button] })],
+				components: [new ActionRowBuilder<ButtonBuilder>().addComponents(button)],
 			});
 		} else {
 			await interaction.reply({
@@ -72,7 +68,7 @@ class RandomStreamer {
 	}
 
 	@Slash("history", { description: "Shows history of previous random streamers" })
-	@SlashGroup({ name: "random" })
+	@SlashGroup("random")
 	async history(interaction: CommandInteraction<"cached">) {
 		const history = await getRepository(ChooseHistoryEntity).find({
 			order: {
@@ -99,7 +95,7 @@ class RandomStreamer {
 	}
 
 	@Slash("clear", { description: "Clears random streamers history" })
-	@SlashGroup({ name: "random" })
+	@SlashGroup("random")
 	async clear(interaction: CommandInteraction) {
 		await getRepository(ChooseHistoryEntity).delete({});
 		await interaction.reply({
